@@ -27,6 +27,7 @@ void setup() {
 
 void loop()
 {
+  // no hejka !
   unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillis >= interval) {
