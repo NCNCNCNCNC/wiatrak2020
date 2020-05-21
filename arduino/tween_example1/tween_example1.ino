@@ -35,6 +35,9 @@ void loop() {
       // i tak az nie doejdziemy do konca tablicy, i od poczatku...
       // analogicznie jak to robilismy ostatnio
       Serial.println("DONE!");
+      // kolejna animacja od obecnej wartosci value do 10 przez 1 sek..
+      // tylko oczywiscie to bedzie musialo isc z tablicy i sie zmieniac dla kolejnych krokow
+      tween = TweenDuino::Tween::to(value, 1000UL, 10);
     }
 
     
