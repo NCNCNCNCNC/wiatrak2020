@@ -15,13 +15,16 @@ Servo servo;
 //int angle = 10;
 int k = 0;
 TM1637Display display (2, 3);
-TweenDuino::Tween *tween;
+
+// oddzielne zmienne dla 2 tweenow 
+TweenDuino::Tween *valueTween;
+TweenDuino::Tween *angleTween;
 
 
 void setup() {
   Serial.begin(9600);
-  tween = TweenDuino::Tween::to(value, 5000UL, values[0]);
-  tween = TweenDuino::Tween::to(ang, 5000UL, angles[0]);
+  valueTween = TweenDuino::Tween::to(value, 5000UL, values[0]);
+  angleTween = TweenDuino::Tween::to(ang, 5000UL, angles[0]);
   display.setBrightness(105);
   pinMode(FAN_PIN, OUTPUT);
   servo.attach(8);
@@ -31,9 +34,10 @@ void setup() {
 
 void loop() {
 
-  tween->update(millis());
+  valueTween->update(millis());
+  angleTween->update(millis());
 
-  if (tween->isComplete()) {
+  if (valueTween->isComplete()) {
 
     Serial.println("DONE!");
     Serial.println(value);
@@ -45,14 +49,17 @@ void loop() {
       currentIndex = 0;
     }
     delay(3025);
-    tween = TweenDuino::Tween::to(value, 5000UL, values[currentIndex]);
-    tween = TweenDuino::Tween::to(ang, 5000UL, angles[currentIndex]);
+    valueTween = TweenDuino::Tween::to(value, 5000UL, values[currentIndex]);
+    angleTween = TweenDuino::Tween::to(ang, 5000UL, angles[currentIndex]);
   }
 
 
-  if (tween->isActive()) {
+  if (valueTween->isActive()) {
     display.showNumberDec(value);
     analogWrite(FAN_PIN, map(value, 50, 2827, 120, 250));
+  }
+
+  if (angleTween->isActive()) {
     servo.write(ang);
     //    servo.write( currentIndex * 30 );
     Serial.println(ang);
