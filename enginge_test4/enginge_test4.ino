@@ -108,7 +108,7 @@ void updateMotion() {
   }
 
   if (valueTween->isActive()) {
-    LED.print8(value);
+    LED.print8(int(value));
     int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
     motor.write(motorSpeed);
     Serial.println(motorSpeed);
@@ -141,7 +141,7 @@ void loop() {
 //  Serial.println(motorSpeed);
 //  motor.write(motorSpeed);
 
-  delay(50);
+  //delay(50);
 
   // for (int i=0; i<180; i++){
   //
