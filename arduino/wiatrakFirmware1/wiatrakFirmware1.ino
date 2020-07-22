@@ -111,10 +111,9 @@ void updateMotion() {
     
   }
 
-
   if (valueTween->isActive()) {
     LED.print8(value);
-    motor.write(map(value, 51, 2827, 50, 180));
+    motor.write(map(value, 51, 2827, 0, 180));
     //Serial.println(value);
   }
 
@@ -134,13 +133,9 @@ void loop() {
   }
 
   if ( sequenceStarted ) {
-
     updateMotion();
-
   } else {
-
     //LED.print8("-", "-", "-", "-", "-", "-", "-", "-");
-
   }
 
 }
