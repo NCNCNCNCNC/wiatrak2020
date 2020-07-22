@@ -1,10 +1,12 @@
 #include <TweenDuino.h>
 #include <Servo.h>
-#include "DFRobot_LedDisplayModule.h"
-DFRobot_LedDisplayModule LED(Wire, 0xE0);
+//#include "DFRobot_LedDisplayModule.h"
+//DFRobot_LedDisplayModule LED(Wire, 0xE0);
 
 #define MOTOR_PIN 6
 #define SERVO_PIN 3
+#define MIN_MOTOR_SPEED 80
+#define MAX_MOTOR_SPEED 150
 Servo servo;
 Servo motor;
 
@@ -32,24 +34,35 @@ boolean sequenceStarted = false;
 void setup() {
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(MOTOR_PIN, OUTPUT);
+  pinMode(SERVO_PIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  digitalWrite(MOTOR_PIN, LOW);
+  delay(10);
   
+  motor.attach( MOTOR_PIN );
+  motor.write(MIN_MOTOR_SPEED);
   servo.attach( SERVO_PIN );
-  motor.attach( MOTOT_PIN );
-
   servo.write(0);
-  motor.write(0);
+  
+  Serial.begin(9600);
+  
+//  /*Wait for the chip to be initialized completely, and then exit*/
+//  while (LED.begin8() != 0) {
+//    Serial.println("Initialization of the chip failed, please confirm that the chip connection is correct!");
+//    delay(1000);
+//  }
+//  /* Set the display area*/
+//  LED.setDisplayArea8(1, 2, 3, 4, 5, 6, 7, 8);
+//  LED.print8("H", "E", "L", "L", "0", "", "", "");
+  
 
-  Serial.begin(115200);
-  /*Wait for the chip to be initialized completely, and then exit*/
-  while (LED.begin8() != 0) {
-    Serial.println("Initialization of the chip failed, please confirm that the chip connection is correct!");
-    delay(1000);
-  }
-  /* Set the display area*/
-  LED.setDisplayArea8(1, 2, 3, 4, 5, 6, 7, 8);
-  LED.print8("H", "E", "L", "L", "0", "", "", "");
-  Serial.println( "hello" );
-  delay(1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(8000);
+  digitalWrite( LED_BUILTIN, HIGH );
+  
+  startSequence();
 
 }
 
@@ -106,15 +119,14 @@ void updateMotion() {
     
     valueTween = TweenDuino::Tween::to(value, duration, values[currentIndex]);
     angleTween = TweenDuino::Tween::to(ang, duration, angles[currentIndex]);
-
-    Serial.println( "ping" );
     
   }
 
   if (valueTween->isActive()) {
-    LED.print8(value);
-    motor.write(map(value, 51, 2827, 0, 180));
-    //Serial.println(value);
+    //LED.print8(value);
+    int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
+    motor.write(motorSpeed);
+    Serial.println(motorSpeed);
   }
 
   if (angleTween->isActive()) {
@@ -128,14 +140,16 @@ void loop() {
 
   checkButton();
 
-  if ( btnState == HIGH && !sequenceStarted) {
-    startSequence();
-  }
+//  if ( btnState == HIGH && !sequenceStarted) {
+//    startSequence();
+//  }
 
   if ( sequenceStarted ) {
     updateMotion();
   } else {
     //LED.print8("-", "-", "-", "-", "-", "-", "-", "-");
   }
+
+  //delay(50);
 
 }

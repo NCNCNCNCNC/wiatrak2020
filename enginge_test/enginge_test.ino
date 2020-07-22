@@ -12,7 +12,7 @@ void setup() {
   pinMode(6, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  digitalWrite(6, LOW );
+  digitalWrite(6, LOW);
   delay(10);
   
   servo.attach(6);
