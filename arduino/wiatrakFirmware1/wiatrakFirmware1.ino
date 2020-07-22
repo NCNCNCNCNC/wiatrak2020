@@ -2,6 +2,7 @@
 #include <Servo.h>
 #include "DFRobot_LedDisplayModule.h"
 DFRobot_LedDisplayModule LED(Wire, 0xE0);
+
 Servo motor;
 Servo servo;
 
@@ -107,10 +108,12 @@ void updateMotion() {
   }
 
   if (valueTween->isActive()) {
-    LED.print8(int(value));
+
+    LED.print8( value );
+    
     int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
     motor.write(motorSpeed);
-    Serial.println(motorSpeed);
+    
   }
 
   if (angleTween->isActive()) {
