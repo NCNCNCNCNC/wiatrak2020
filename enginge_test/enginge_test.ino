@@ -1,22 +1,26 @@
+#include <TweenDuino.h>
 #include <Servo.h>
-Servo servo;
+Servo motor;
 
+#define MOTOR_PIN 6
 #define MIN_SPEED 35
 #define MAX_SPEED 150
 
 int i = 0;
 
+TweenDuino::Tween *valueTween;
+
 void setup() {
 
-  pinMode(A0, INPUT);
-  pinMode(6, OUTPUT);
+  //pinMode(A0, INPUT);
+  pinMode(MOTOR_PIN, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  digitalWrite(6, LOW);
+  digitalWrite(MOTOR_PIN, LOW);
   delay(10);
   
-  servo.attach(6);
-  servo.write(MIN_SPEED);
+  motor.attach(MOTOR_PIN);
+  motor.write(MIN_SPEED);
 
   Serial.begin(9600);
   
@@ -37,7 +41,7 @@ void loop() {
   
   int motorSpeed = map(i, 0, 1024, MIN_SPEED, MAX_SPEED);
   Serial.println(motorSpeed);
-  servo.write(motorSpeed);
+  motor.write(motorSpeed);
 
   delay(50);
 
