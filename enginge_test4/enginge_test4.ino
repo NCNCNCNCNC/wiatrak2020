@@ -7,8 +7,9 @@ Servo servo;
 
 #define MOTOR_PIN 6
 #define SERVO_PIN 3
-#define MIN_MOTOR_SPEED 35
-#define MAX_MOTOR_SPEED 150
+#define MIN_MOTOR_SPEED 45
+#define MAX_MOTOR_SPEED 140
+#define MOTOR_INIT_VAL 30
 
 #define BUTTON_PIN 12
 int btnState = HIGH;   // the current state of the output pin
@@ -31,8 +32,6 @@ TweenDuino::Tween *valueTween;
 TweenDuino::Tween *angleTween;
 boolean sequenceStarted = false;
 
-int i = 0;
-
 void setup() {
 
   //pinMode(A0, INPUT);
@@ -40,17 +39,17 @@ void setup() {
   pinMode(SERVO_PIN, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  digitalWrite(MOTOR_PIN, LOW);
-  delay(10);
+  //digitalWrite(MOTOR_PIN, LOW);
+  //delay(10);
   
   motor.attach(MOTOR_PIN);
-  motor.write(MIN_MOTOR_SPEED);
+  motor.write(MOTOR_INIT_VAL); // nie moze byc zero
   servo.attach(SERVO_PIN);
   servo.write(0);
 
   Serial.begin(9600);
 
-    /*Wait for the chip to be initialized completely, and then exit*/
+  /*Wait for the chip to be initialized completely, and then exit*/
   while (LED.begin8() != 0) {
     Serial.println("Initialization of the chip failed, please confirm that the chip connection is correct!");
     delay(1000);
@@ -121,33 +120,30 @@ void updateMotion() {
 
 }
 
+void checkButton() {
+
+  reading = digitalRead(BUTTON_PIN);
+  if (reading == HIGH && previous == LOW && millis() - time > debounce) {
+    if (btnState == HIGH)
+      btnState = LOW;
+    else
+      btnState = HIGH;
+    time = millis();
+  }
+  previous = reading;
+
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
   //
+  checkButton();
   
-  int val = analogRead(A0);
   if ( sequenceStarted ) {
     updateMotion();
   } else {
-    //LED.print8("-", "-", "-", "-", "-", "-", "-", "-");
+    LED.print8("-", "-", "-", "-", "-", "-", "-", "-");
   }
-
-//  i++;
-//  if( i >= 1023 ){
-//    i = 0;
-//  }
-//  
-//  int motorSpeed = map(i, 0, 1024, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
-//  Serial.println(motorSpeed);
-//  motor.write(motorSpeed);
-
-  //delay(50);
-
-  // for (int i=0; i<180; i++){
-  //
-  //  servo.write(i);
-  //  delay(100);
-  // }
 
 
 }
