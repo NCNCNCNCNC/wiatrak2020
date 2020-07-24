@@ -25,10 +25,9 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   
-  //dtostrf(value, 4, 1, buff);
-  sprintf(buff,"%04d", int(value));
+  //https://arduinobasics.blogspot.com/2019/05/sprintf-function.html
+  sprintf(buff,"%4d", int(value));
   
   alpha4.writeDigitAscii(0, buff[0]);
   alpha4.writeDigitAscii(1, buff[1]);
