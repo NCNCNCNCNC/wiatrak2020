@@ -40,7 +40,7 @@ void loop() {
   for( int i = 0; i < 4; i++ ){
 
     if( scrollOffset < 0 ){
-      alpha4.writeDigitAscii(i + (scrollOffset*-1), buff[i]);
+      alpha4.writeDigitAscii(i - scrollOffset, buff[i]); // -- = +
     }else{
       alpha4.writeDigitAscii(i, buff[i + scrollOffset]);
     }
