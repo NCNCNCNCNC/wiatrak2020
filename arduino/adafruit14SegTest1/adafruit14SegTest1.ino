@@ -6,7 +6,7 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 
 float value = 0.0;
 char buff[32];
-String txt = "COVID-19";
+String txt = "TUBERCULOSIS";
 int scrollOffset = 0;
 int frameLength = 4;
 
