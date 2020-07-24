@@ -25,20 +25,25 @@ void setup() {
 }
 
 void loop() {
+
+  float s = sin( millis() / 100 ) * 100;
+  int b = map( s, -100, 100, 0, 15 );
   
   //https://arduinobasics.blogspot.com/2019/05/sprintf-function.html
-  sprintf(buff,"%4d", int(value));
-  
-  alpha4.writeDigitAscii(0, buff[0]);
-  alpha4.writeDigitAscii(1, buff[1]);
-  alpha4.writeDigitAscii(2, buff[2]);
-  alpha4.writeDigitAscii(3, buff[3]);
+  sprintf(buff,"%4d", int(value)); //
 
+  for( int i = 0; i < 4; i++ ){
+    alpha4.writeDigitAscii(i, buff[i]);
+  }
+
+  
+
+  alpha4.setBrightness(b);
   alpha4.writeDisplay();
 
   value += 1;
   
-  delay(10);
+  delay(5);
   
   
 }
