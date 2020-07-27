@@ -10,7 +10,13 @@ Adafruit_AlphaNum4 displays[2] = { Adafruit_AlphaNum4(), Adafruit_AlphaNum4() };
 
 float value = 0.0;
 char buff[32];
-String txt = "2015"; //TUBERCULOSIS
+String txt = "MEASLES"; //TUBERCULOSIS
+
+const char *diseaseNames[] = {
+ "MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS 2015"
+};
+
+
 int scrollOffset = 0;
 int frameLength = 8;
 
@@ -39,7 +45,7 @@ void displaySet( int charIndex, char c ) {
   displays[ charIndex / CHAR_PER_DISPLAY ].writeDigitAscii( charIndex % CHAR_PER_DISPLAY, c );
 }
 
-void setDisplayText( int offset, char text[] ) {
+void setDisplayText( int offset, char *text ) {
 
   if ( offset >= 0 ) {
 
@@ -57,7 +63,7 @@ void setDisplayText( int offset, char text[] ) {
 
     for ( int i = 0; i < CHAR_COUNT; i++ ) {
 
-      if ( i + (offset * -1) > int(txt.length()) - 1 ) {
+      if ( i + (offset * -1) > int(strlen(text)) - 1 ) {
         displaySet(i, ' ' );
       } else {
         displaySet(i, text[i + (offset * -1)] );
@@ -79,9 +85,9 @@ void loop() {
   float s = sin( millis() / 100 ) * 100;
   int b = map( s, -100, 100, 0, 15 );
 
-  setDisplayText( -scrollOffset, buff );
+  setDisplayText( -scrollOffset, diseaseNames[1] );
 
-  if ( scrollOffset < int(txt.length()) ) { // ????
+  if ( scrollOffset < int(strlen(diseaseNames[1])) ) { // ????
     scrollOffset++;
   } else {
     scrollOffset = -(frameLength - 1);
@@ -89,7 +95,7 @@ void loop() {
 
   value += 1;
 
-  delay(16);
+  delay(100);
 
 
 }
