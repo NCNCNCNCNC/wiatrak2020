@@ -69,19 +69,30 @@ void loop() {
   float s = sin( millis() / 100 ) * 100;
   int b = map( s, -100, 100, 0, 15 );
 
-  sprintf(buff,"%8d", int(value));
+  sprintf(buff,"%d", int(value));
+
+  int strLen = int(strlen(buff));
+
+  //scrollOffset = CHAR_COUNT - strLen; // LEFT
+  scrollOffset = -CHAR_COUNT/2 + strLen/2; // CENTER
+  Serial.print( strLen );
+  Serial.print( ", " );
+  Serial.println( scrollOffset );
+  Serial.println( int(value) );
 
   setDisplayText( -scrollOffset, buff ); //diseaseNames[diseaseIndex]
 
-  if ( scrollOffset < int(strlen(buff)) ) { // ????
-    scrollOffset++;
-  } else {
-    scrollOffset = -(frameLength - 1);
-  }
 
-  value += 1;
 
-  delay(50);
+//  if ( scrollOffset < int(strlen(buff)) ) { // ????
+//    scrollOffset++;
+//  } else {
+//    scrollOffset = -(frameLength - 1);
+//  }
+
+  value += 100;
+
+  delay(5);
 
 
 }
