@@ -12,9 +12,10 @@ Adafruit_AlphaNum4 displays[2] = { Adafruit_AlphaNum4(), Adafruit_AlphaNum4() };
 
 float value = 0.0;
 char buff[32];
+char displayBuffer[8];
 String txt = "TUBERCULOSIS";
 int scrollOffset = 0;
-int frameLength = 4;
+int frameLength = 8;
 
 void setup() {
   
@@ -22,30 +23,10 @@ void setup() {
 
   for( int i = 0; i < DISPLAYS_NUM; i ++ ){
     displays[i].begin(0x70+i);
-    displays[i].setBrightness(15);
+    displays[i].setBrightness(12);
     displays[i].clear();
     displays[i].writeDisplay();
   }
-
-  int txtIndex = 0;
-  for( int di = 0; di < DISPLAYS_NUM; di ++ ){
-
-    for( int ci = 0; ci < CHAR_PER_DISPLAY; ci ++ ){
-
-//      Serial.print( i );
-//      Serial.print( ", " );
-//      Serial.print( c );
-//      Serial.print( ", " );
-//      Serial.println( charIndex++ );
-
-      displays[di].writeDigitAscii( ci, txt.charAt( txtIndex++ ) );
-        
-    }
-
-    displays[di].writeDisplay();
-  
-  }
-  
 
   for( int i = 0; i < 32; i++ ){
     buff[i] = ' ';
@@ -57,14 +38,96 @@ void setup() {
   
 }
 
+void displaySet( int charIndex, char c ){
+  displays[ charIndex / CHAR_PER_DISPLAY ].writeDigitAscii( charIndex % CHAR_PER_DISPLAY, c );
+}
+
+void setDisplayBuffer( int offset, String text ){
+
+  if( offset >= 0 ){
+    
+     for( int i = 0; i < 8; i++ ){
+      
+      if( i < offset ){
+        displaySet(i, ' ' );
+      }else{
+        displaySet(i, text.charAt(i-offset) );
+      }
+      
+     }
+     
+  }else{
+
+    for( int i = 0; i < 8; i++ ){
+      
+      if( i+(offset*-1) > int(text.length())-1 ){
+        displaySet(i, ' ' );
+      }else{
+        displaySet(i, text.charAt(i+(offset*-1)) );
+      }
+      
+     }
+    
+  }
+  
+
+  
+}
+
+
 void loop() {
 
   float s = sin( millis() / 100 ) * 100;
   int b = map( s, -100, 100, 0, 15 );
 
-  for( int i = 0; i < CHAR_COUNT; i++ ){
-    //displays[i]
+//  for( int i = 0; i < 8; i++ ){
+//    displaySet( i, buff[i] );
+//  }
+
+  setDisplayBuffer( -2, txt );
+  
+  for( int i = 0; i < DISPLAYS_NUM; i++ ){
+    displays[i].writeDisplay();
   }
+  
+
+//  int txtIndex = 0;
+//  for( int di = 0; di < DISPLAYS_NUM; di ++ ){
+//
+//    for( int ci = 0; ci < CHAR_PER_DISPLAY; ci ++ ){
+//
+////      Serial.print( di );
+////      Serial.print( ", " );
+////      Serial.print( ci );
+////      Serial.print( ", " );
+//
+//      if( scrollOffset < 0 ){
+//
+//        if( ci - scrollOffset < 4 ){
+//          displays[di].writeDigitAscii(ci - scrollOffset, buff[txtIndex]); // -- = +
+//        }
+//        
+////        
+////        Serial.print( ci - scrollOffset );
+////        Serial.print( ", " );
+////        Serial.print( buff[txtIndex] );
+//      }else{
+//        displays[di].writeDigitAscii(ci, buff[txtIndex + scrollOffset]);
+//        
+////        Serial.print( txtIndex + scrollOffset );
+////        Serial.print( ", " );
+////        Serial.print( buff[txtIndex + scrollOffset] );
+//      }
+//
+//      //Serial.println( "---" );
+//      txtIndex++;
+//      //displays[di].writeDigitAscii( ci, txt.charAt( txtIndex++ ) );
+//        
+//    }
+//
+//    displays[di].writeDisplay();
+//  
+//  }
   
   //https://arduinobasics.blogspot.com/2019/05/sprintf-function.html
   //sprintf(buff,"%4d", int(value));//
@@ -84,16 +147,16 @@ void loop() {
 //
 //  value += 1;
 //
-//  if( scrollOffset < int(txt.length()) ){ // ????
-//    scrollOffset++;
-//  }else{
-//    scrollOffset = -(frameLength-1);
-//  }
+  if( scrollOffset < int(txt.length()) ){ // ????
+    scrollOffset++;
+  }else{
+    scrollOffset = -(frameLength-1);
+  }
 
 
   
   
-  delay(100);
+  delay(300);
   
   
 }
