@@ -42,7 +42,7 @@ void displaySet( int charIndex, char c ){
   displays[ charIndex / CHAR_PER_DISPLAY ].writeDigitAscii( charIndex % CHAR_PER_DISPLAY, c );
 }
 
-void setDisplayBuffer( int offset, String text ){
+void setDisplayText( int offset, String text ){
 
   if( offset >= 0 ){
     
@@ -70,7 +70,9 @@ void setDisplayBuffer( int offset, String text ){
     
   }
   
-
+  for( int i = 0; i < DISPLAYS_NUM; i++ ){
+    displays[i].writeDisplay();
+  }
   
 }
 
@@ -80,83 +82,15 @@ void loop() {
   float s = sin( millis() / 100 ) * 100;
   int b = map( s, -100, 100, 0, 15 );
 
-//  for( int i = 0; i < 8; i++ ){
-//    displaySet( i, buff[i] );
-//  }
-
-  setDisplayBuffer( -2, txt );
+  setDisplayText( -scrollOffset, txt );
   
-  for( int i = 0; i < DISPLAYS_NUM; i++ ){
-    displays[i].writeDisplay();
-  }
-  
-
-//  int txtIndex = 0;
-//  for( int di = 0; di < DISPLAYS_NUM; di ++ ){
-//
-//    for( int ci = 0; ci < CHAR_PER_DISPLAY; ci ++ ){
-//
-////      Serial.print( di );
-////      Serial.print( ", " );
-////      Serial.print( ci );
-////      Serial.print( ", " );
-//
-//      if( scrollOffset < 0 ){
-//
-//        if( ci - scrollOffset < 4 ){
-//          displays[di].writeDigitAscii(ci - scrollOffset, buff[txtIndex]); // -- = +
-//        }
-//        
-////        
-////        Serial.print( ci - scrollOffset );
-////        Serial.print( ", " );
-////        Serial.print( buff[txtIndex] );
-//      }else{
-//        displays[di].writeDigitAscii(ci, buff[txtIndex + scrollOffset]);
-//        
-////        Serial.print( txtIndex + scrollOffset );
-////        Serial.print( ", " );
-////        Serial.print( buff[txtIndex + scrollOffset] );
-//      }
-//
-//      //Serial.println( "---" );
-//      txtIndex++;
-//      //displays[di].writeDigitAscii( ci, txt.charAt( txtIndex++ ) );
-//        
-//    }
-//
-//    displays[di].writeDisplay();
-//  
-//  }
-  
-  //https://arduinobasics.blogspot.com/2019/05/sprintf-function.html
-  //sprintf(buff,"%4d", int(value));//
-
-//  for( int i = 0; i < 4; i++ ){
-//
-//    if( scrollOffset < 0 ){
-//      alpha4.writeDigitAscii(i - scrollOffset, buff[i]); // -- = +
-//    }else{
-//      alpha4.writeDigitAscii(i, buff[i + scrollOffset]);
-//    }
-//    
-//  }
-//
-//  //alpha4.setBrightness(b);
-//  alpha4.writeDisplay();
-//
-//  value += 1;
-//
   if( scrollOffset < int(txt.length()) ){ // ????
     scrollOffset++;
   }else{
     scrollOffset = -(frameLength-1);
   }
-
-
   
-  
-  delay(300);
+  delay(100);
   
   
 }
