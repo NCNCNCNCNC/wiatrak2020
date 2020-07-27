@@ -69,9 +69,11 @@ void loop() {
   float s = sin( millis() / 100 ) * 100;
   int b = map( s, -100, 100, 0, 15 );
 
-  setDisplayText( -scrollOffset, diseaseNames[diseaseIndex] );
+  sprintf(buff,"%8d", int(value));
 
-  if ( scrollOffset < int(strlen(diseaseNames[diseaseIndex])) ) { // ????
+  setDisplayText( -scrollOffset, buff ); //diseaseNames[diseaseIndex]
+
+  if ( scrollOffset < int(strlen(buff)) ) { // ????
     scrollOffset++;
   } else {
     scrollOffset = -(frameLength - 1);
@@ -79,7 +81,7 @@ void loop() {
 
   value += 1;
 
-  delay(100);
+  delay(50);
 
 
 }
