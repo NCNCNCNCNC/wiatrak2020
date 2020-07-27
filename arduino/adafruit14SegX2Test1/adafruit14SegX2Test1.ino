@@ -14,7 +14,7 @@ char buff[32];
 const char *diseaseNames[] = {
   "TUBERCULOSIS", "MEASLES", "COVID-19", "SWINE FLU", "MERS 2015"
 };
-int diseaseIndex = 0;
+int diseaseIndex = 1;
 
 
 int scrollOffset = 0;
@@ -42,33 +42,20 @@ void displaySet( int charIndex, char c ) {
 }
 
 void setDisplayText( int offset, char *text ) {
+
+  int txtLen = int(strlen(text));
   
-  if ( offset > 0 ) {
+  for ( int i = 0; i < CHAR_COUNT; i++ ) {
+    
+    boolean setEmpty = ( offset > 0 ) ? ( i < offset || i - offset > txtLen - 1) : ( i - offset > txtLen - 1 );
 
-    for ( int i = 0; i < CHAR_COUNT; i++ ) {
-
-      if ( i < offset || i - offset > int(strlen(text)) - 1) {
-        displaySet(i, ' ' );
-      } else {
-        displaySet(i, text[i - offset] );
-      }
-
+    if ( setEmpty ) {
+      displaySet(i, ' ' );
+    } else {
+      displaySet(i, text[i - offset] );
     }
 
-  } else {
-
-    for ( int i = 0; i < CHAR_COUNT; i++ ) {
-      
-      if ( i + (offset * -1) > int(strlen(text)) - 1 ) {
-        displaySet(i, ' ' );
-      } else {
-        displaySet( i, text[i + (offset * -1)]);
-        //Serial.println( i + (offset * -1) );
-      }
-
-    }
-
-  }
+   }
 
   for ( int i = 0; i < DISPLAYS_NUM; i++ ) {
     displays[i].writeDisplay();
