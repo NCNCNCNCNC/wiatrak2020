@@ -15,6 +15,14 @@ typedef enum {
 
 } TextAlign;
 
+typedef enum {
+
+  SCROLL_LEFT,
+  SCROLL_RIGHT,
+
+} ScrollDir;
+
+
 class DisplayController {
 
   private:
@@ -25,9 +33,10 @@ class DisplayController {
     int scrollOffset = 0;
     int txtLen = 0;
     TextAlign txtAlign = ALIGN_LEFT;
+    ScrollDir scrollDir = SCROLL_LEFT;
 
     unsigned long previousMillis = 0;
-    const long interval = 16;
+    unsigned long interval = 200;
 
   public:
 
@@ -70,10 +79,22 @@ class DisplayController {
 
           case ALIGN_FREE:
 
-            if ( scrollOffset < txtLen ) { 
-              scrollOffset++;
+            if ( scrollDir == SCROLL_RIGHT ) {
+
+              if ( scrollOffset < txtLen ) {
+                scrollOffset++;
+              } else {
+                scrollOffset = -(CHAR_COUNT - 1);
+              }
+
             } else {
-              scrollOffset = -(CHAR_COUNT - 1);
+
+              if ( scrollOffset > -txtLen ) {
+                scrollOffset--;
+              } else {
+                scrollOffset = CHAR_COUNT;
+              }
+
             }
 
             break;
@@ -85,7 +106,9 @@ class DisplayController {
         }
 
       }
-      
+
+
+
     }
 
     void writeChar( int charIndex, char c ) {
@@ -96,14 +119,20 @@ class DisplayController {
       txtAlign = _txtAlign;
     }
 
+    void setScrollSpeed( unsigned long speed ) {
+      interval = speed;
+    }
+
     void setDisplayText( char *text ) {
 
       txtLen = int(strlen(text));
       strcpy(buff, text);
 
+      int offset = scrollOffset;
+
       for ( int i = 0; i < CHAR_COUNT; i++ ) {
 
-        boolean setEmpty = ( scrollOffset > 0 ) ? ( i < scrollOffset || i - scrollOffset > txtLen - 1) : ( i - scrollOffset > txtLen - 1 );
+        boolean setEmpty = ( offset > 0 ) ? ( i < offset || i - offset > txtLen - 1) : ( i - offset > txtLen - 1 );
 
         if ( setEmpty ) {
           writeChar(i, ' ' );

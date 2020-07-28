@@ -14,7 +14,7 @@ void setup() {
   Serial.begin(9600);
 
   displayController.setup();
-  displayController.setTextAlign( ALIGN_CENTER );
+  displayController.setTextAlign( ALIGN_FREE );
 
 
 }
@@ -24,7 +24,6 @@ void loop() {
   char buff[16];
   sprintf(buff, "%ld", long(value));
 
-  
   displayController.setDisplayText( buff );
   displayController.update();
 
