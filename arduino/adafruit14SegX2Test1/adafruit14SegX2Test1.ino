@@ -14,17 +14,20 @@ void setup() {
   Serial.begin(9600);
 
   displayController.setup();
+  displayController.setTextAlign( ALIGN_CENTER );
+
 
 }
 
 void loop() {
 
-  char buff[32];
+  char buff[16];
   sprintf(buff, "%ld", long(value));
+
   
   displayController.setDisplayText( buff );
   displayController.update();
 
-  value += 10;
+  value += 1;
 
 }

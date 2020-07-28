@@ -6,16 +6,28 @@
 #define CHAR_COUNT 8
 #define CHAR_PER_DISPLAY 4
 
-Adafruit_AlphaNum4 displays[2] = { Adafruit_AlphaNum4(), Adafruit_AlphaNum4() };
+typedef enum {
 
-char buff[32];
-int scrollOffset = 0;
-int txtLen = 0;
+  ALIGN_LEFT,
+  ALIGN_RIGHT,
+  ALIGN_CENTER,
+  ALIGN_FREE
 
-unsigned long previousMillis = 0;
-const long interval = 16;
+} TextAlign;
 
 class DisplayController {
+
+  private:
+
+    Adafruit_AlphaNum4 displays[2] = { Adafruit_AlphaNum4(), Adafruit_AlphaNum4() };
+
+    char buff[32];
+    int scrollOffset = 0;
+    int txtLen = 0;
+    TextAlign txtAlign = ALIGN_LEFT;
+
+    unsigned long previousMillis = 0;
+    const long interval = 16;
 
   public:
 
@@ -42,38 +54,46 @@ class DisplayController {
 
         previousMillis = currentMillis;
 
+        switch ( txtAlign ) {
 
-        //sprintf(buff, "%ld", long(value));
-        //int strLen = int(strlen(buff));
+          case ALIGN_LEFT:
+            scrollOffset = 0;
+            break;
 
-        scrollOffset = CHAR_COUNT - txtLen; // RIGHT
-        //scrollOffset = 0; // LEFT
-        //scrollOffset = -CHAR_COUNT / 2 + txtLen / 2; // CENTER
+          case ALIGN_RIGHT:
+            scrollOffset = CHAR_COUNT - txtLen;
+            break;
 
-        //        Serial.print( strLen );
-        //        Serial.print( ", " );
-        //        Serial.println( scrollOffset );
-        //        Serial.println( int(value) );
+          case ALIGN_CENTER:
+            scrollOffset = CHAR_COUNT / 2 - txtLen / 2;
+            break;
 
-        //setDisplayText( -scrollOffset, buff ); //diseaseNames[diseaseIndex]
+          case ALIGN_FREE:
 
-        //  if ( scrollOffset < int(strlen(buff)) ) { // ????
-        //    scrollOffset++;
-        //  } else {
-        //    scrollOffset = -(frameLength - 1);
-        //  }
+            if ( scrollOffset < txtLen ) { 
+              scrollOffset++;
+            } else {
+              scrollOffset = -(CHAR_COUNT - 1);
+            }
 
-        //value += 100;
+            break;
+
+        }
 
         for ( int i = 0; i < DISPLAYS_NUM; i++ ) {
           displays[i].writeDisplay();
         }
 
       }
+      
     }
 
     void writeChar( int charIndex, char c ) {
       displays[ charIndex / CHAR_PER_DISPLAY ].writeDigitAscii( charIndex % CHAR_PER_DISPLAY, c );
+    }
+
+    void setTextAlign( TextAlign _txtAlign ) {
+      txtAlign = _txtAlign;
     }
 
     void setDisplayText( char *text ) {
