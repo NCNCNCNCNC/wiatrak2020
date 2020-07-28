@@ -26,7 +26,7 @@ void setup() {
 
   for ( int i = 0; i < DISPLAYS_NUM; i ++ ) {
     displays[i].begin(0x70 + i);
-    displays[i].setBrightness(12);
+    displays[i].setBrightness(15);
     displays[i].clear();
     displays[i].writeDisplay();
   }
@@ -69,7 +69,7 @@ void loop() {
   float s = sin( millis() / 100 ) * 100;
   int b = map( s, -100, 100, 0, 15 );
 
-  sprintf(buff,"%d", int(value));
+  sprintf(buff,"%ld", long(value));
 
   int strLen = int(strlen(buff));
 
