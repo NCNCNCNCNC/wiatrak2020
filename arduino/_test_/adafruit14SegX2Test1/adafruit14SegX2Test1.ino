@@ -24,8 +24,8 @@ void loop() {
   //char buff[16];
   //sprintf(buff, "%ld", long(value));
 
-  //displayController.writeText( buff );
-  displayController.writeNumber( value, 2 );
+  displayController.writeText( "HELLO" );
+  //displayController.writeNumber( long(value) );
   displayController.update();
 
   value += 0.1;

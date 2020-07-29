@@ -1,7 +1,8 @@
 #include <TweenDuino.h>
 #include <Servo.h>
-#include "DFRobot_LedDisplayModule.h"
-DFRobot_LedDisplayModule LED(Wire, 0xE0);
+#include "DisplayController.h"
+
+DisplayController displayController;
 
 Servo motor;
 Servo servo;
@@ -11,6 +12,8 @@ Servo servo;
 #define MIN_MOTOR_SPEED 45
 #define MAX_MOTOR_SPEED 140
 #define MOTOR_INIT_VAL 30
+#define MIN_SERVO_MS 500
+#define MAX_SERVO_MS 2500
 
 #define BUTTON_PIN 12
 int btnState = HIGH;   // the current state of the output pin
@@ -21,7 +24,7 @@ long debounce = 200;   // the debounce time, increase if the output flickers
 
 #define VALUES_COUNT 12
 float values [] = {99, 99, 983, 983, 2827, 2827, 1515, 1515, 195, 195, 51, 51};
-float angles [] = {0, 0, 45, 45, 90, 90, 135, 135, 180, 180, 225, 225};
+float angles [] = {0, 0, 36, 36, 72, 72, 108, 108, 144, 144, 180, 180};
 //float angles [] = {30, 30, 60, 60, 90, 90, 120, 120, 150, 150, 180, 180};
 int currentIndex = 0;
 float value = 0.0;
@@ -46,19 +49,15 @@ void setup() {
   
   motor.attach(MOTOR_PIN);
   motor.write(MOTOR_INIT_VAL); // nie moze byc zero
-  servo.attach(SERVO_PIN);
+  servo.attach(SERVO_PIN, MIN_SERVO_MS, MAX_SERVO_MS);
   servo.write(0);
 
   Serial.begin(9600);
 
-  /*Wait for the chip to be initialized completely, and then exit*/
-  while (LED.begin8() != 0) {
-    Serial.println("Initialization of the chip failed, please confirm that the chip connection is correct!");
-    delay(1000);
-  }
-  /* Set the display area*/
-  LED.setDisplayArea8(1, 2, 3, 4, 5, 6, 7, 8);
-  LED.print8("H", "E", "L", "L", "0", "", "", "");
+  displayController.setup();
+  displayController.setTextAlign( ALIGN_CENTER );
+  displayController.writeText( "HELLO" );
+  displayController.updateImmediate();
   
   digitalWrite( LED_BUILTIN, LOW );
   delay(8000);
@@ -69,7 +68,7 @@ void setup() {
 }
 
 void startSequence() {
-  Serial.println( "sequence started" );
+  //Serial.println( "sequence started" );
   valueTween = TweenDuino::Tween::to(value, transitionDuration, values[0]);
   angleTween = TweenDuino::Tween::to(ang, transitionDuration, angles[0]);
   sequenceStarted = true;
@@ -81,16 +80,16 @@ void updateMotion() {
   valueTween->update(ms);
   angleTween->update(ms);
 
-  if (valueTween->isComplete()) {
+  if (valueTween->isComplete() && angleTween->isComplete()) {
 
-    Serial.println("DONE!");
-    Serial.println(value);
+    //Serial.println("DONE!");
+    //Serial.println(value);
     if (currentIndex < VALUES_COUNT - 1) {
       currentIndex ++;
     } else {
       currentIndex = 0;
     }
-    Serial.println(currentIndex);
+    //Serial.println(currentIndex);
 
     unsigned long duration = 500UL;
     if (value == values[currentIndex]) {
@@ -110,7 +109,7 @@ void updateMotion() {
 
   if (valueTween->isActive()) {
 
-    LED.print8( value );
+    //displayController.writeNumber( long(value) );
     
     int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
     motor.write(motorSpeed);
@@ -118,8 +117,11 @@ void updateMotion() {
   }
 
   if (angleTween->isActive()) {
-    servo.write(ang);
+    displayController.writeNumber( long(ang) );
+    //delay(5);
+    servo.write(int(ang));
   }
+
 
 
 }
@@ -146,8 +148,10 @@ void loop() {
   if ( sequenceStarted ) {
     updateMotion();
   } else {
-    LED.print8("-", "-", "-", "-", "-", "-", "-", "-");
+    displayController.writeText( "WAITING" );
   }
+
+  displayController.update();
 
 
 }

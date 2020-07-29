@@ -8,6 +8,8 @@
 */
 
 #include <Servo.h>
+#define MIN_SERVO_MS 500
+#define MAX_SERVO_MS 2500
 
 Servo myservo;  // create servo object to control a servo
 // twelve servo objects can be created on most boards
