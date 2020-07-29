@@ -21,12 +21,13 @@ void setup() {
 
 void loop() {
 
-  char buff[16];
-  sprintf(buff, "%ld", long(value));
+  //char buff[16];
+  //sprintf(buff, "%ld", long(value));
 
-  displayController.setDisplayText( buff );
+  //displayController.writeText( buff );
+  displayController.writeNumber( value, 2 );
   displayController.update();
 
-  value += 1;
+  value += 0.1;
 
 }

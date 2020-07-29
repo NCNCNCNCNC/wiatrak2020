@@ -30,13 +30,14 @@ class DisplayController {
     Adafruit_AlphaNum4 displays[2] = { Adafruit_AlphaNum4(), Adafruit_AlphaNum4() };
 
     char buff[32];
-    int scrollOffset = 0;
+    float scrollOffset = 0;
+    float scrollSpeed = 0.1;
     int txtLen = 0;
     TextAlign txtAlign = ALIGN_LEFT;
     ScrollDir scrollDir = SCROLL_LEFT;
 
     unsigned long previousMillis = 0;
-    unsigned long interval = 200;
+    unsigned long interval = 10;
 
   public:
 
@@ -82,7 +83,7 @@ class DisplayController {
             if ( scrollDir == SCROLL_RIGHT ) {
 
               if ( scrollOffset < txtLen ) {
-                scrollOffset++;
+                scrollOffset += scrollSpeed;
               } else {
                 scrollOffset = -(CHAR_COUNT - 1);
               }
@@ -90,7 +91,7 @@ class DisplayController {
             } else {
 
               if ( scrollOffset > -txtLen ) {
-                scrollOffset--;
+                scrollOffset -= scrollSpeed;
               } else {
                 scrollOffset = CHAR_COUNT;
               }
@@ -119,16 +120,37 @@ class DisplayController {
       txtAlign = _txtAlign;
     }
 
-    void setScrollSpeed( unsigned long speed ) {
-      interval = speed;
+    void setScrollSpeed( float speed ) {
+      scrollSpeed = speed;
     }
 
-    void setDisplayText( char *text ) {
+    void writeNumber( int num ){
+      char buff[16];
+      sprintf(buff, "%d", num);
+      writeText( buff );
+    }
+
+    void writeNumber( long num ){
+      char buff[16];
+      sprintf(buff, "%ld", num);
+      writeText( buff );
+    }
+
+    // TODO - draw dot - https://forums.adafruit.com/viewtopic.php?f=47&t=75183
+    void writeNumber( float num, int decimal ){
+      char buff[16];
+      String value = String(num, decimal); // TODO - replace String class usage...
+      char *result = value.c_str();
+      sprintf(buff, "%s", result); //formatBuff
+      writeText( buff );
+    }
+
+    void writeText( char *text ) {
 
       txtLen = int(strlen(text));
       strcpy(buff, text);
 
-      int offset = scrollOffset;
+      int offset = int(scrollOffset);
 
       for ( int i = 0; i < CHAR_COUNT; i++ ) {
 
@@ -137,7 +159,7 @@ class DisplayController {
         if ( setEmpty ) {
           writeChar(i, ' ' );
         } else {
-          writeChar(i, text[i - scrollOffset] );
+          writeChar(i, text[i - offset] );
         }
 
       }
