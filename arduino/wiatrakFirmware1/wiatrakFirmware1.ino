@@ -109,7 +109,7 @@ void updateMotion() {
 
   if (valueTween->isActive()) {
 
-    //displayController.writeNumber( long(value) );
+    displayController.writeNumber( long(value) );
     
     int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
     motor.write(motorSpeed);
@@ -117,7 +117,7 @@ void updateMotion() {
   }
 
   if (angleTween->isActive()) {
-    displayController.writeNumber( long(ang) );
+    //displayController.writeNumber( long(ang) );
     //delay(5);
     servo.write(int(ang));
   }
