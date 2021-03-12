@@ -25,7 +25,7 @@ long debounce = 200;   // the debounce time, increase if the output flickers
 #define VALUES_COUNT 12
 float values [] = {99, 99, 983, 983, 2827, 2827, 1515, 1515, 195, 195, 51, 51};
 float angles [] = {0, 0, 36, 36, 72, 72, 108, 108, 144, 144, 180, 180};
-//float angles [] = {30, 30, 60, 60, 90, 90, 120, 120, 150, 150, 180, 180};
+
 int currentIndex = 0;
 float value = 0.0;
 float ang = 0.0;
