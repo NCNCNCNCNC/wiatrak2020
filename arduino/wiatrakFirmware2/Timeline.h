@@ -7,6 +7,7 @@ typedef struct _keyframe {
     float val;
     unsigned long dur;
     KeyEasing ease;
+    unsigned long pause;
 } Keyframe;
 
 
@@ -25,7 +26,11 @@ class Timeline {
   unsigned long duration;
   unsigned long keyDuration;
 
+  unsigned long pauseDuration;
+  unsigned long pauseTimer;
+
   bool running = false;
+  bool paused = false;
   bool finished = false;
   
   
@@ -112,30 +117,33 @@ class Timeline {
   void update(){
 
     if( running ){
+
+      if( paused ){
+
+        if( millis() - pauseTimer <= keyframes[ keyframeIndex ].pause ){
+          return;
+        }else{
+          paused = false;
+          nextKeyframe();
+        }
+        
+      }
     
       double p = getCurrentKeyProgress();
   
-      // DEBUG
-//      Serial.print( keyframeIndex );
-//      Serial.print( " " );
-//      Serial.print( keyDuration );
-//      Serial.print( " " );
-//      Serial.print( previousValue );
-//      Serial.print( " " );
-//      Serial.print( destinationValue );
-//      Serial.print( " " );
-//      Serial.print( p );
-//      Serial.print( " " );
-//      Serial.println( currentValue );
-      //
-      
       if( millis() < timer + keyDuration ){
    
          currentValue = keyframes[ keyframeIndex ].ease( p, previousValue, destinationValue - previousValue, 1.0 );
          
       }else{
+
+         if(keyframes[ keyframeIndex ].pause > 0){
+            pauseTimer = millis();
+            paused = true;
+         }else{
+            nextKeyframe();
+         }
          
-         nextKeyframe();
          
       }
 
@@ -179,6 +187,24 @@ class Timeline {
   bool isFinished(){
     return finished;
   }
+
+  bool isPaused(){
+    return paused;
+  }
+
+        // DEBUG
+//      Serial.print( keyframeIndex );
+//      Serial.print( " " );
+//      Serial.print( keyDuration );
+//      Serial.print( " " );
+//      Serial.print( previousValue );
+//      Serial.print( " " );
+//      Serial.print( destinationValue );
+//      Serial.print( " " );
+//      Serial.print( p );
+//      Serial.print( " " );
+//      Serial.println( currentValue );
+      //
 
   
 };

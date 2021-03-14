@@ -88,7 +88,7 @@ void setupSequence(int srcIndex){
 
   for( int i = 0; i < VALUES_COUNT; i ++ ){
 
-    keyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic };
+    keyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
     
   }
   
@@ -122,14 +122,14 @@ void update() {
   servo.write( getCurrentServoPos() );
 
   if( mainTimeline.isFinished() ){
+    
     currentDiseaseIndex = ((currentDiseaseIndex + 1) % DISEASE_COUNT);
     setupSequence( currentDiseaseIndex );
+    mainTimeline.play( keyframeBuffer, VALUES_COUNT );
     
     Serial.print("Disease index: ");
     Serial.println( currentDiseaseIndex );
 
-    mainTimeline.play( keyframeBuffer, VALUES_COUNT );
-    
   }
 
   //Serial.print( mainTimeline.getCurrentValue());
