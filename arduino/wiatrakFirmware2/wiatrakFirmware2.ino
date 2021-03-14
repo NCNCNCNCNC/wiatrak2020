@@ -20,10 +20,10 @@ Servo servo;
 char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS2015"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
   {99, 983, 2827, 1515, 195, 51},
-  {99, 983, 2827, 1515, 195, 51},
-  {99, 983, 2827, 1515, 195, 51},
-  {99, 983, 2827, 1515, 195, 51},
-  {99, 983, 2827, 1515, 195, 51}
+  {66, 1683, 3827, 3515, 695, 71},
+  {129, 83, 5827, 4515, 1195, 31},
+  {10, 120500, 827, 15, 1555, 10000},
+  {999, 683, 1687, 155, 95, 99999}
 };
 float angles [] = {0, 36, 72, 108, 144, 180};
 Keyframe keyframeBuffer[VALUES_COUNT];
@@ -115,13 +115,26 @@ int getCurrentServoPos(){
 void update() {
   
   mainTimeline.update();
+  
   displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
   displayController.update();
+
+  servo.write( getCurrentServoPos() );
+
+  if( mainTimeline.isFinished() ){
+    currentDiseaseIndex = ((currentDiseaseIndex + 1) % DISEASE_COUNT);
+    setupSequence( currentDiseaseIndex );
+    
+    Serial.print("Disease index: ");
+    Serial.println( currentDiseaseIndex );
+
+    mainTimeline.play( keyframeBuffer, VALUES_COUNT );
+    
+  }
 
   //Serial.print( mainTimeline.getCurrentValue());
   //Serial.print( ", " );
   //Serial.println( getCurrentServoPos() );
-  servo.write( getCurrentServoPos() );
   
   //int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
   //motor.write(motorSpeed);

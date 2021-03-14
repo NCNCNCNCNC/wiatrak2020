@@ -99,7 +99,7 @@ class Timeline {
     }else{
 
       if( running ){
-         //Serial.println( "----------- END --------------" );
+         Serial.println( "----------- END --------------" );
          finished = true;
       }
       
@@ -113,7 +113,7 @@ class Timeline {
 
     if( running ){
     
-      double p = double(millis() - timer) / double( keyDuration );
+      double p = getCurrentKeyProgress();
   
       // DEBUG
 //      Serial.print( keyframeIndex );
