@@ -1,5 +1,5 @@
-#include <TweenDuino.h>
 #include <Servo.h>
+#include "Timeline.h"
 #include "DisplayController.h"
 
 DisplayController displayController;
@@ -15,30 +15,43 @@ Servo servo;
 #define MIN_SERVO_MS 500
 #define MAX_SERVO_MS 2500
 
-#define BUTTON_PIN 12
-int btnState = HIGH;   // the current state of the output pin
-int reading;           // the current reading from the input pin
-int previous = LOW;    // the previous reading from the input pin
-long time = 0;         // the last time the output pin was toggled
-long debounce = 200;   // the debounce time, increase if the output flickers
-
-#define VALUES_COUNT 12
+#define VALUES_COUNT 6
+#define DISEASE_COUNT 5
 char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS2015"};
-float values [] = {99, 99, 983, 983, 2827, 2827, 1515, 1515, 195, 195, 51, 51};
+float deaths[DISEASE_COUNT][VALUES_COUNT] = {
+  {99, 983, 2827, 1515, 195, 51},
+  {99, 983, 2827, 1515, 195, 51},
+  {99, 983, 2827, 1515, 195, 51},
+  {99, 983, 2827, 1515, 195, 51},
+  {99, 983, 2827, 1515, 195, 51}
+};
+float angles [] = {0, 36, 72, 108, 144, 180};
+Keyframe keyframeBuffer[VALUES_COUNT];
+Timeline mainTimeline;
 
-float angles [] = {0, 0, 36, 36, 72, 72, 108, 108, 144, 144, 180, 180};
-
-int currentIndex = 0;
+int currentDiseaseIndex = 0;
+int currentDeathIndex = 0;
 float value = 0.0;
 float ang = 0.0;
 
 unsigned long transitionDuration = 5000;
 unsigned long pauseDuration = 2000;
+unsigned long transitonTimer = 0;
 boolean isPaused = true;
+float start_sec;
 
-TweenDuino::Tween *valueTween;
-TweenDuino::Tween *angleTween;
 boolean sequenceStarted = false;
+
+typedef enum {
+
+  INIT,
+  TRANSITION,
+  STOP
+  
+} State;
+
+State currentState = INIT;
+
 
 void setup() {
 
@@ -59,112 +72,69 @@ void setup() {
 
   displayController.setup();
   displayController.setTextAlign( ALIGN_CENTER );
-  displayController.writeText( "HELLO" );
+  displayController.writeText( "HELLO123" );
   displayController.updateImmediate();
   
   digitalWrite( LED_BUILTIN, LOW );
-  delay(8000);
+  delay(1000);
   digitalWrite( LED_BUILTIN, HIGH );
 
+  setupSequence(currentDiseaseIndex);
   startSequence();
   
 }
 
-void startSequence() {
-  //Serial.println( "sequence started" );
-  valueTween = TweenDuino::Tween::to(value, transitionDuration, values[0]);
-  angleTween = TweenDuino::Tween::to(ang, transitionDuration, angles[0]);
-  sequenceStarted = true;
-}
+void setupSequence(int srcIndex){
 
-void updateMotion() {
+  for( int i = 0; i < VALUES_COUNT; i ++ ){
 
-  unsigned long ms = millis();
-  valueTween->update(ms);
-  angleTween->update(ms);
-
-  if (valueTween->isComplete() && angleTween->isComplete()) {
-
-    //Serial.println("DONE!");
-    //Serial.println(value);
-    if (currentIndex < VALUES_COUNT - 1) {
-      currentIndex ++;
-    } else {
-      currentIndex = 0;
-    }
-    //Serial.println(currentIndex);
-
-    unsigned long duration = 500UL;
-    if (value == values[currentIndex]) {
-      duration = pauseDuration;
-      isPaused = true;
-    }
-    else {
-      duration = transitionDuration;
-      isPaused = false;
-    }
-
-    delete valueTween;
-    delete angleTween;
-    
-    valueTween = TweenDuino::Tween::to(value, duration, values[currentIndex]);
-    angleTween = TweenDuino::Tween::to(ang, duration, angles[currentIndex]);
-
-    
+    keyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic };
     
   }
-
-  if (valueTween->isActive()) {
-
-    if( isPaused ){
-      displayController.setTextAlign( ALIGN_FREE );
-      displayController.writeText( diseases[currentIndex%5] );
-    }else{
-      displayController.setTextAlign( ALIGN_CENTER );
-      displayController.writeNumber( long(value) );
-    }
-    
-    int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
-    motor.write(motorSpeed);
-    
-  }
-
-  if (angleTween->isActive()) {
-    //displayController.writeNumber( long(ang) );
-    //delay(5);
-    servo.write(int(ang));
-  }
-
-
-
-}
-
-void checkButton() {
-
-  reading = digitalRead(BUTTON_PIN);
-  if (reading == HIGH && previous == LOW && millis() - time > debounce) {
-    if (btnState == HIGH)
-      btnState = LOW;
-    else
-      btnState = HIGH;
-    time = millis();
-  }
-  previous = reading;
-
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  //
-  checkButton();
   
-  if ( sequenceStarted ) {
-    updateMotion();
-  } else {
-    displayController.writeText( "WAITING" );
-  }
+}
 
+void startSequence() {
+  
+  sequenceStarted = true;
+  mainTimeline.play( keyframeBuffer, VALUES_COUNT );
+  
+}
+
+int getCurrentServoPos(){
+  
+  float val = mainTimeline.getCurrentRemappedValue( 
+    angles[mainTimeline.getCurrentKeyIndex()], 
+    angles[min(mainTimeline.getCurrentKeyIndex()+1, VALUES_COUNT-1)] 
+  );
+
+  return int( val ); 
+  
+}
+
+void update() {
+  
+  mainTimeline.update();
+  displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
   displayController.update();
 
+  //Serial.print( mainTimeline.getCurrentValue());
+  //Serial.print( ", " );
+  //Serial.println( getCurrentServoPos() );
+  servo.write( getCurrentServoPos() );
+  
+  //int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
+  //motor.write(motorSpeed);
+  //servo.write(int(ang));
+
+
+}
+
+
+
+void loop() {
+  
+  update();
+  
 
 }
