@@ -17,7 +17,7 @@ Servo servo;
 
 #define VALUES_COUNT 6
 #define DISEASE_COUNT 5
-char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS2015"};
+char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS 2015"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
   {99, 983, 2827, 1515, 195, 51},
   {66, 1683, 3827, 3515, 695, 71},
@@ -115,11 +115,18 @@ int getCurrentServoPos(){
 void update() {
   
   mainTimeline.update();
-  
-  displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
   displayController.update();
 
   servo.write( getCurrentServoPos() );
+
+  if( mainTimeline.isPaused() ){
+    //Serial.println("paused...");
+    displayController.setTextAlign( ALIGN_FREE );
+    displayController.writeText( diseases[currentDiseaseIndex] );
+  }else{
+    displayController.setTextAlign( ALIGN_CENTER );
+    displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+  }
 
   if( mainTimeline.isFinished() ){
     
