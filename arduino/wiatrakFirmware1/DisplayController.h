@@ -148,6 +148,10 @@ class DisplayController {
       writeText( buff );
     }
 
+    void writeText( String &text ) {
+      writeText( text.c_str() );
+    }
+
     void writeText( char *text ) {
 
       txtLen = int(strlen(text));

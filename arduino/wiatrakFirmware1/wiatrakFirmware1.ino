@@ -118,7 +118,7 @@ void updateMotion() {
 
     if( isPaused ){
       displayController.setTextAlign( ALIGN_FREE );
-      displayController.writeText( diseases[currentIndex%5].c_str() );
+      displayController.writeText( diseases[currentIndex%5] );
     }else{
       displayController.setTextAlign( ALIGN_CENTER );
       displayController.writeNumber( long(value) );
