@@ -23,7 +23,9 @@ long time = 0;         // the last time the output pin was toggled
 long debounce = 200;   // the debounce time, increase if the output flickers
 
 #define VALUES_COUNT 12
+String diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS2015"};
 float values [] = {99, 99, 983, 983, 2827, 2827, 1515, 1515, 195, 195, 51, 51};
+
 float angles [] = {0, 0, 36, 36, 72, 72, 108, 108, 144, 144, 180, 180};
 
 int currentIndex = 0;
@@ -32,6 +34,7 @@ float ang = 0.0;
 
 unsigned long transitionDuration = 5000;
 unsigned long pauseDuration = 2000;
+boolean isPaused = true;
 
 TweenDuino::Tween *valueTween;
 TweenDuino::Tween *angleTween;
@@ -94,9 +97,11 @@ void updateMotion() {
     unsigned long duration = 500UL;
     if (value == values[currentIndex]) {
       duration = pauseDuration;
+      isPaused = true;
     }
     else {
       duration = transitionDuration;
+      isPaused = false;
     }
 
     delete valueTween;
@@ -104,12 +109,20 @@ void updateMotion() {
     
     valueTween = TweenDuino::Tween::to(value, duration, values[currentIndex]);
     angleTween = TweenDuino::Tween::to(ang, duration, angles[currentIndex]);
+
+    
     
   }
 
   if (valueTween->isActive()) {
 
-    displayController.writeNumber( long(value) );
+    if( isPaused ){
+      displayController.setTextAlign( ALIGN_FREE );
+      displayController.writeText( diseases[currentIndex%5].c_str() );
+    }else{
+      displayController.setTextAlign( ALIGN_CENTER );
+      displayController.writeNumber( long(value) );
+    }
     
     int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
     motor.write(motorSpeed);
