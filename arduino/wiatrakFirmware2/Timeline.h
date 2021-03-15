@@ -63,6 +63,7 @@ class Timeline {
     timer = millis();
     running = true;
     finished = false;
+    paused = false;
     
   }
 
