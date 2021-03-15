@@ -1,3 +1,5 @@
+// WIATRAK FRIRMWARE v2
+
 #include <Servo.h>
 #include "Timeline.h"
 #include "DisplayController.h"
@@ -52,17 +54,6 @@ boolean isPaused = true;
 float start_sec;
 
 boolean sequenceStarted = false;
-
-typedef enum {
-
-  INIT,
-  TRANSITION,
-  STOP
-  
-} State;
-
-State currentState = INIT;
-
 
 void setup() {
 
@@ -213,5 +204,5 @@ void loop() {
   
   update();
   
-
 }
+//EOF.
