@@ -19,6 +19,8 @@ Servo servo;
 
 #define VALUES_COUNT 6
 #define DISEASE_COUNT 5
+#define INFO_COUNT 4
+
 char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS 2015"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
   {99, 983, 2827, 1515, 195, 51},
@@ -48,7 +50,7 @@ float value = 0.0;
 float ang = 0.0;
 
 unsigned long transitionDuration = 5000;
-unsigned long pauseDuration = 8500;
+unsigned long pauseDuration = 0; // ustawiane w setup na bazie pauz w info
 unsigned long transitonTimer = 0;
 boolean isPaused = true;
 float start_sec;
@@ -81,9 +83,18 @@ void setup() {
   delay(1000);
   digitalWrite( LED_BUILTIN, HIGH );
 
+  pauseDuration = getPauseDuration();
   setupSequence(currentDiseaseIndex);
   startSequence();
   
+}
+
+unsigned long getPauseDuration(){
+  unsigned long sum = 0;
+  for( int i = 0; i < INFO_COUNT; i ++ ){
+    sum += infoPauses[i];
+  }
+  return sum;
 }
 
 void setupSequence(int srcIndex){
@@ -98,7 +109,7 @@ void setupSequence(int srcIndex){
 
 void setInfoSequence(){
 
-  for( int i = 0; i < 4; i ++ ){
+  for( int i = 0; i < INFO_COUNT; i ++ ){
 
     infoKeyframeBuffer[ i ] = { 100, infoPauses[i], Easing::easeInOutCubic, 0 };
     
@@ -140,6 +151,9 @@ void update() {
       Serial.println("start info seq");
       
     }else{
+
+      Serial.print( "info key: " );
+      Serial.println(  infoTimeline.getCurrentKeyIndex()  );
       
       switch ( infoTimeline.getCurrentKeyIndex() ){
 
