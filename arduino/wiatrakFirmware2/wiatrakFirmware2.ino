@@ -138,6 +138,7 @@ int getCurrentServoPos(){
 void update() {
   
   mainTimeline.update();
+  infoTimeline.update();
   displayController.update();
 
   servo.write( getCurrentServoPos() );
@@ -180,8 +181,6 @@ void update() {
       }
       
     }
-
-    infoTimeline.update();
     
   }else{ // PRZEJSCIE
     
