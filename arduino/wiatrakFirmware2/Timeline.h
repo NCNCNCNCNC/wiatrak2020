@@ -119,6 +119,8 @@ class Timeline {
 
     if( running ){
 
+      
+
       if( paused ){
 
         if( millis() - pauseTimer <= keyframes[ keyframeIndex ].pause ){
@@ -132,9 +134,10 @@ class Timeline {
     
       double p = getCurrentKeyProgress();
   
-      if( millis() < timer + keyDuration ){
+      if( millis() <= timer + keyDuration ){
    
          currentValue = keyframes[ keyframeIndex ].ease( p, previousValue, destinationValue - previousValue, 1.0 );
+         //Serial.println( currentValue );
          
       }else{
 
@@ -144,7 +147,6 @@ class Timeline {
          }else{
             nextKeyframe();
          }
-         
          
       }
 

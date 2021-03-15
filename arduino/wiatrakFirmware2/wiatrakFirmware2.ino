@@ -25,9 +25,20 @@ float deaths[DISEASE_COUNT][VALUES_COUNT] = {
   {10, 120500, 827, 15, 1555, 10000},
   {999, 683, 1687, 155, 95, 99999}
 };
+char *dates[DISEASE_COUNT][VALUES_COUNT] = {
+  {"01/2001", "02/2001", "03/2001", "04/2001", "05/2001"},
+  {"01/2002", "02/2002", "03/2002", "04/2002", "05/2002"},
+  {"01/2003", "02/2003", "03/2003", "04/2003", "05/2003"},
+  {"01/2004", "02/2004", "03/2004", "04/2004", "05/2004"},
+  {"01/2005", "02/2005", "03/2005", "04/2005", "05/2005"},
+};
 float angles [] = {0, 36, 72, 108, 144, 180};
-Keyframe keyframeBuffer[VALUES_COUNT];
+Keyframe mainKeyframeBuffer[VALUES_COUNT];
 Timeline mainTimeline;
+Keyframe infoKeyframeBuffer[VALUES_COUNT];
+Timeline infoTimeline;
+int infoPauses[] = { 1000, 3000, 2000, 1000 };
+
 
 int currentDiseaseIndex = 0;
 int currentDeathIndex = 0;
@@ -35,7 +46,7 @@ float value = 0.0;
 float ang = 0.0;
 
 unsigned long transitionDuration = 5000;
-unsigned long pauseDuration = 2000;
+unsigned long pauseDuration = 8500;
 unsigned long transitonTimer = 0;
 boolean isPaused = true;
 float start_sec;
@@ -88,7 +99,17 @@ void setupSequence(int srcIndex){
 
   for( int i = 0; i < VALUES_COUNT; i ++ ){
 
-    keyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
+    mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
+    
+  }
+  
+}
+
+void setInfoSequence(){
+
+  for( int i = 0; i < 4; i ++ ){
+
+    infoKeyframeBuffer[ i ] = { 100, infoPauses[i], Easing::easeInOutCubic, 0 };
     
   }
   
@@ -97,7 +118,7 @@ void setupSequence(int srcIndex){
 void startSequence() {
   
   sequenceStarted = true;
-  mainTimeline.play( keyframeBuffer, VALUES_COUNT );
+  mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT );
   
 }
 
@@ -119,20 +140,56 @@ void update() {
 
   servo.write( getCurrentServoPos() );
 
-  if( mainTimeline.isPaused() ){
-    //Serial.println("paused...");
-    displayController.setTextAlign( ALIGN_FREE );
-    displayController.writeText( diseases[currentDiseaseIndex] );
-  }else{
+  if( mainTimeline.isPaused() ){ // PAUZA
+
+    if( !infoTimeline.isRunning() ){
+      
+      setInfoSequence();
+      infoTimeline.play( infoKeyframeBuffer, 4 );
+      Serial.println("start info seq");
+      
+    }else{
+      
+      switch ( infoTimeline.getCurrentKeyIndex() ){
+
+        case 0: // WARTOSC
+           displayController.setTextAlign( ALIGN_CENTER );
+           displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+        break;
+        
+        case 1: // NAZWA
+           displayController.setTextAlign( ALIGN_FREE );
+           displayController.writeText( diseases[currentDiseaseIndex] );
+        break;
+
+        case 2: // DATA
+          displayController.setTextAlign( ALIGN_CENTER );
+          displayController.writeText( dates[currentDiseaseIndex][mainTimeline.getCurrentKeyIndex()] );
+        break;
+
+         case 3: // WARTOSC
+           displayController.setTextAlign( ALIGN_CENTER );
+           displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+        break;
+        
+      }
+      
+    }
+
+    infoTimeline.update();
+    
+  }else{ // PRZEJSCIE
+    
     displayController.setTextAlign( ALIGN_CENTER );
     displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+    
   }
 
   if( mainTimeline.isFinished() ){
     
     currentDiseaseIndex = ((currentDiseaseIndex + 1) % DISEASE_COUNT);
     setupSequence( currentDiseaseIndex );
-    mainTimeline.play( keyframeBuffer, VALUES_COUNT );
+    mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT );
     
     Serial.print("Disease index: ");
     Serial.println( currentDiseaseIndex );
