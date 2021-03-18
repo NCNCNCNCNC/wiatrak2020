@@ -17,17 +17,17 @@ Servo servo;
 #define MIN_SERVO_MS 500
 #define MAX_SERVO_MS 2500
 
-#define VALUES_COUNT 6
+#define VALUES_COUNT 7
 #define DISEASE_COUNT 5
 #define INFO_COUNT 4
 
 char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS 2015"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
-  {535300, 454000, 164000, 122000, 89780, 140000},
-  {1700000, 1670000, 1550000, 1450000, 1370000, 1310000},
-  {40689, 142664, 167775, 155571, 275007, 412363},
-  {99, 983, 1827, 1515, 195, 51},
-  {6, 100, 277, 268, 30, 0}
+  {535300, 454000, 164000, 122000, 89780, 140000, 0},
+  {1700000, 1670000, 1550000, 1450000, 1370000, 1310000, 0},
+  {40689, 142664, 167775, 155571, 275007, 412363, 0},
+  {99, 983, 1827, 1515, 195, 51, 0},
+  {6, 100, 277, 268, 30, 0, 0}
 };
 float deathValBounds[DISEASE_COUNT][2] = {
   {89780, 535300},
@@ -37,17 +37,17 @@ float deathValBounds[DISEASE_COUNT][2] = {
   {0, 277}
 };
 char *dates[DISEASE_COUNT][VALUES_COUNT] = {
-  {"2000", "2004", "2008", "2012", "2016", "2018"},
-  {"2000", "2003", "2006", "2009", "2012", "2015"},
-  {"03/2020", "05/2020", "07/2020", "09/2020", "11/2020", "01/2021"},
-  {"05/2009", "08/2009", "10/2009", "02/2010", "05/2010", "08/2010"},
-  {"2012", "2013", "2014", "2015", "2016", "2017"}
+  {"2000", "2004", "2008", "2012", "2016", "2018", "///"},
+  {"2000", "2003", "2006", "2009", "2012", "2015", "///"},
+  {"03/2020", "05/2020", "07/2020", "09/2020", "11/2020", "01/2021", "///"},
+  {"05/2009", "08/2009", "10/2009", "02/2010", "05/2010", "08/2010", "///"},
+  {"2012", "2013", "2014", "2015", "2016", "2017", "///"}
 };
 float angles [] = {0, 0, 36, 72, 108, 144, 180};
 //float angles [] = {0, 30, 60, 90, 120, 150, 180};
 Keyframe mainKeyframeBuffer[VALUES_COUNT];
 Timeline mainTimeline;
-Keyframe infoKeyframeBuffer[VALUES_COUNT];
+Keyframe infoKeyframeBuffer[INFO_COUNT];
 Timeline infoTimeline;
 int infoPauses[] = { 2000, 3000, 2000, 2000 };
 
@@ -110,7 +110,11 @@ void setupSequence(int srcIndex){
 
   for( int i = 0; i < VALUES_COUNT; i ++ ){
 
-    mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
+    if( i < VALUES_COUNT-1 ){
+      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
+    }else{
+      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], 5000, Easing::easeInOutCubic, 0 };
+    }
     
   }
   
@@ -137,10 +141,14 @@ int getCurrentServoPos(){
   
   float val = mainTimeline.getCurrentRemappedValue( 
     angles[mainTimeline.getCurrentKeyIndex()], 
-    angles[min(mainTimeline.getCurrentKeyIndex()+1, VALUES_COUNT)] 
+    angles[(mainTimeline.getCurrentKeyIndex()+1) % (VALUES_COUNT)]
   );
 
-  Serial.println( int(val) );
+//  Serial.print( mainTimeline.getCurrentKeyIndex() );
+//  Serial.print( ", " );
+//  Serial.print( (mainTimeline.getCurrentKeyIndex()+1) % (VALUES_COUNT-1) );
+//  Serial.print( ", " );
+//  Serial.println( int(val) );
 
   return int( val ); 
   
@@ -169,12 +177,12 @@ void update() {
       
       setInfoSequence();
       infoTimeline.play( infoKeyframeBuffer, 4 );
-      Serial.println("start info seq");
+      //Serial.println("start info seq");
       
     }else{
 
-      Serial.print( "info key: " );
-      Serial.println(  infoTimeline.getCurrentKeyIndex()  );
+      //Serial.print( "info key: " );
+      //Serial.println(  infoTimeline.getCurrentKeyIndex()  );
       
       switch ( infoTimeline.getCurrentKeyIndex() ){
 
