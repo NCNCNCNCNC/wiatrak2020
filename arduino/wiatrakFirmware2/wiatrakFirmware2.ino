@@ -23,12 +23,19 @@ Servo servo;
 
 char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS 2015"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
-  {535300, 454000, 164000, 122000,89780,140000},
+  {535300, 454000, 164000, 122000, 89780, 140000},
   {1700000, 1670000, 1550000, 1450000, 1370000, 1310000},
-  {40689, 142664, 167775, 155571, 275007 412363},
+  {40689, 142664, 167775, 155571, 275007, 412363},
   {99, 983, 1827, 1515, 195, 51},
   {6, 100, 277, 268, 30, 0}
 };
+float deathValBounds[DISEASE_COUNT][2] = {
+  {89780, 535300},
+  {1310000, 1700000},
+  {142664, 412363},
+  {51, 1827},
+  {0, 277}
+}
 char *dates[DISEASE_COUNT][VALUES_COUNT] = {
   {"2000", "2004", "2008", "2012", "2016", "2018"},
   {"2000", "2003", "2006", "2009", "2012", "2015"},
@@ -83,6 +90,7 @@ void setup() {
   delay(1000);
   digitalWrite( LED_BUILTIN, HIGH );
 
+ 
   pauseDuration = getPauseDuration();
   setupSequence(currentDiseaseIndex);
   startSequence();
@@ -135,13 +143,22 @@ int getCurrentServoPos(){
   
 }
 
+int getCurrentMotorSpeed(){
+
+  int motorSpeed = map(value, deathValBounds[currentDiseaseIndex][0], deathValBounds[currentDiseaseIndex][1], MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
+  return motorSpeed;
+  
+}
+
 void update() {
   
   mainTimeline.update();
   infoTimeline.update();
+  
   displayController.update();
 
   servo.write( getCurrentServoPos() );
+  motor.write( getCurrentMotorSpeed() );
 
   if( mainTimeline.isPaused() ){ // PAUZA
 
@@ -204,9 +221,8 @@ void update() {
   //Serial.print( ", " );
   //Serial.println( getCurrentServoPos() );
   
-  //int motorSpeed = map(value, 51, 2827, MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
-  //motor.write(motorSpeed);
-  //servo.write(int(ang));
+  
+  
 
 
 }
