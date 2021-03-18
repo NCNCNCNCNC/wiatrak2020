@@ -44,7 +44,6 @@ char *dates[DISEASE_COUNT][VALUES_COUNT] = {
   {"2012", "2013", "2014", "2015", "2016", "2017", "///"}
 };
 float angles [] = {0, 0, 36, 72, 108, 144, 180};
-//float angles [] = {0, 30, 60, 90, 120, 150, 180};
 Keyframe mainKeyframeBuffer[VALUES_COUNT];
 Timeline mainTimeline;
 Keyframe infoKeyframeBuffer[INFO_COUNT];
@@ -145,12 +144,6 @@ int getCurrentServoPos(){
     angles[(mainTimeline.getCurrentKeyIndex()+1) % (VALUES_COUNT)]
   );
 
-//  Serial.print( mainTimeline.getCurrentKeyIndex() );
-//  Serial.print( ", " );
-//  Serial.print( (mainTimeline.getCurrentKeyIndex()+1) % (VALUES_COUNT-1) );
-//  Serial.print( ", " );
-//  Serial.println( int(val) );
-
   return int( val ); 
   
 }
@@ -178,12 +171,8 @@ void update() {
       
       setInfoSequence();
       infoTimeline.play( infoKeyframeBuffer, 4 );
-      //Serial.println("start info seq");
       
     }else{
-
-      //Serial.print( "info key: " );
-      //Serial.println(  infoTimeline.getCurrentKeyIndex()  );
       
       switch ( infoTimeline.getCurrentKeyIndex() ){
 
@@ -217,11 +206,11 @@ void update() {
     
   }else{ // PRZEJSCIE
 
-    if( mainTimeline.getCurrentKeyIndex() < VALUES_COUNT-1 ){
+    if( mainTimeline.getCurrentKeyIndex() < VALUES_COUNT-1 ){ // JESLI KOLEJNE DANE O ZGONACH
       displayController.setBlinkRate( 0 );
       displayController.setTextAlign( ALIGN_CENTER );
       displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
-    }else{
+    }else{ // JESLI ANIMACJA POWROTU 
       displayController.setTextAlign( ALIGN_FREE );
       displayController.writeText( "*/*/*/*/" );
       displayController.setBlinkRate( 0 );
@@ -236,18 +225,8 @@ void update() {
     setupSequence( currentDiseaseIndex );
     mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT );
     
-    Serial.print("Disease index: ");
-    Serial.println( currentDiseaseIndex );
 
   }
-
-  //Serial.print( mainTimeline.getCurrentValue());
-  //Serial.print( ", " );
-  //Serial.println( getCurrentServoPos() );
-  
-  
-  
-
 
 }
 

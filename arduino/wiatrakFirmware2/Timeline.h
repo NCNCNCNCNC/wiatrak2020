@@ -105,7 +105,7 @@ class Timeline {
     }else{
 
       if( running ){
-         Serial.println( "----------- END --------------" );
+         //Serial.println( "----------- END --------------" );
          finished = true;
       }
       
