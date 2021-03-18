@@ -57,7 +57,8 @@ int currentDeathIndex = 0;
 float value = 0.0;
 float ang = 0.0;
 
-unsigned long transitionDuration = 5000;
+unsigned long transitionDuration = 3000;
+unsigned long returnDuration = 8000;
 unsigned long pauseDuration = 0; // ustawiane w setup na bazie pauz w info
 unsigned long transitonTimer = 0;
 
@@ -113,7 +114,7 @@ void setupSequence(int srcIndex){
     if( i < VALUES_COUNT-1 ){
       mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
     }else{
-      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], 5000, Easing::easeInOutCubic, 0 };
+      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], returnDuration, Easing::easeInOutCubic, 0 };
     }
     
   }
@@ -216,9 +217,16 @@ void update() {
     
   }else{ // PRZEJSCIE
 
-    displayController.setBlinkRate( 0 );
-    displayController.setTextAlign( ALIGN_CENTER );
-    displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+    if( mainTimeline.getCurrentKeyIndex() < VALUES_COUNT-1 ){
+      displayController.setBlinkRate( 0 );
+      displayController.setTextAlign( ALIGN_CENTER );
+      displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+    }else{
+      displayController.setTextAlign( ALIGN_FREE );
+      displayController.writeText( "*/*/*/*/" );
+      displayController.setBlinkRate( 0 );
+    }
+    
     
   }
 
