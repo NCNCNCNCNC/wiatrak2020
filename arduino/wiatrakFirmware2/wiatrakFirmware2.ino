@@ -48,7 +48,7 @@ Keyframe mainKeyframeBuffer[VALUES_COUNT];
 Timeline mainTimeline;
 Keyframe infoKeyframeBuffer[VALUES_COUNT];
 Timeline infoTimeline;
-int infoPauses[] = { 1000, 3000, 2000, 1000 };
+int infoPauses[] = { 2000, 3000, 2000, 2000 };
 
 
 int currentDiseaseIndex = 0;
@@ -178,21 +178,25 @@ void update() {
         case 0: // WARTOSC
            displayController.setTextAlign( ALIGN_CENTER );
            displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+           displayController.setBlinkRate( 100 );
         break;
         
         case 1: // NAZWA
            displayController.setTextAlign( ALIGN_FREE );
            displayController.writeText( diseases[currentDiseaseIndex] );
+           displayController.setBlinkRate( 0 );
         break;
 
         case 2: // DATA
           displayController.setTextAlign( ALIGN_CENTER );
           displayController.writeText( dates[currentDiseaseIndex][mainTimeline.getCurrentKeyIndex()] );
+          displayController.setBlinkRate( 0 );
         break;
 
          case 3: // WARTOSC
            displayController.setTextAlign( ALIGN_CENTER );
            displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+           displayController.setBlinkRate( 100 );
         break;
         
       }
@@ -200,7 +204,8 @@ void update() {
     }
     
   }else{ // PRZEJSCIE
-    
+
+    displayController.setBlinkRate( 0 );
     displayController.setTextAlign( ALIGN_CENTER );
     displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
     

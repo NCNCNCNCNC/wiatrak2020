@@ -39,6 +39,8 @@ class DisplayController {
     unsigned long previousMillis = 0;
     unsigned long interval = 10;
 
+    int blinkRate = 0;
+
   public:
 
     void setup() {
@@ -113,6 +115,18 @@ class DisplayController {
         
       }
 
+      if( blinkRate != 0 ){
+        int b = map( sin( currentMillis / blinkRate ) * 100, -100, 100, 0, 16 );
+        for ( int i = 0; i < DISPLAYS_NUM; i++ ) {
+          displays[i].setBrightness(b);
+          if( b == 0 ){
+            displays[i].clear();
+            displays[i].writeDisplay();
+          }
+        }
+      }
+
+
     }
 
     void writeChar( int charIndex, char c ) {
@@ -171,6 +185,15 @@ class DisplayController {
 
       }
 
+    }
+
+    void setBlinkRate( int b ){
+      blinkRate = b;
+      if( blinkRate == 0 ){
+        for ( int i = 0; i < DISPLAYS_NUM; i++ ) {
+          displays[i].setBrightness(15);
+        }
+      }
     }
 
 
