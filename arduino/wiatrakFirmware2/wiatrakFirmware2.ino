@@ -43,7 +43,8 @@ char *dates[DISEASE_COUNT][VALUES_COUNT] = {
   {"05/2009", "08/2009", "10/2009", "02/2010", "05/2010", "08/2010"},
   {"2012", "2013", "2014", "2015", "2016", "2017"}
 };
-float angles [] = {0, 36, 72, 108, 144, 180};
+float angles [] = {0, 0, 36, 72, 108, 144, 180};
+//float angles [] = {0, 30, 60, 90, 120, 150, 180};
 Keyframe mainKeyframeBuffer[VALUES_COUNT];
 Timeline mainTimeline;
 Keyframe infoKeyframeBuffer[VALUES_COUNT];
@@ -59,8 +60,8 @@ float ang = 0.0;
 unsigned long transitionDuration = 5000;
 unsigned long pauseDuration = 0; // ustawiane w setup na bazie pauz w info
 unsigned long transitonTimer = 0;
-boolean isPaused = true;
-float start_sec;
+
+int displayBlinkRate = 50;
 
 boolean sequenceStarted = false;
 
@@ -136,8 +137,10 @@ int getCurrentServoPos(){
   
   float val = mainTimeline.getCurrentRemappedValue( 
     angles[mainTimeline.getCurrentKeyIndex()], 
-    angles[min(mainTimeline.getCurrentKeyIndex()+1, VALUES_COUNT-1)] 
+    angles[min(mainTimeline.getCurrentKeyIndex()+1, VALUES_COUNT)] 
   );
+
+  Serial.println( int(val) );
 
   return int( val ); 
   
@@ -178,7 +181,7 @@ void update() {
         case 0: // WARTOSC
            displayController.setTextAlign( ALIGN_CENTER );
            displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
-           displayController.setBlinkRate( 100 );
+           displayController.setBlinkRate( displayBlinkRate );
         break;
         
         case 1: // NAZWA
@@ -196,7 +199,7 @@ void update() {
          case 3: // WARTOSC
            displayController.setTextAlign( ALIGN_CENTER );
            displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
-           displayController.setBlinkRate( 100 );
+           displayController.setBlinkRate( displayBlinkRate );
         break;
         
       }
