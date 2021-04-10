@@ -89,7 +89,7 @@ void setup() {
   displayController.updateImmediate();
   
   digitalWrite( LED_BUILTIN, LOW );
-  delay(1000);
+  delay(8000); // zamkienic na 8000 docelowo
   digitalWrite( LED_BUILTIN, HIGH );
 
  
