@@ -21,7 +21,7 @@ Servo servo;
 #define DISEASE_COUNT 5
 #define INFO_COUNT 4
 
-char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS-COV"};
+char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS–COV"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
   {1000000, 535300, 454000, 164000, 12000, 8978, 0},
   {2530000, 2977000, 3500000, 1600000, 1450000, 1800000, 0},
@@ -49,7 +49,8 @@ Keyframe mainKeyframeBuffer[VALUES_COUNT];
 Timeline mainTimeline;
 Keyframe infoKeyframeBuffer[INFO_COUNT];
 Timeline infoTimeline;
-int infoPauses[] = { 2000, 3000, 2000, 2000 };
+
+int infoPauses[] = { 1000, 3000, 2000, 1000 };
 
 
 int currentDiseaseIndex = 0;
@@ -57,7 +58,7 @@ int currentDeathIndex = 0;
 float value = 0.0;
 float ang = 0.0;
 
-unsigned long transitionDuration = 3000;
+unsigned long transitionDuration = 6000;
 unsigned long returnDuration = 8000;
 unsigned long pauseDuration = 0; // ustawiane w setup na bazie pauz w info
 unsigned long transitonTimer = 0;
@@ -75,7 +76,7 @@ void setup() {
 
   //digitalWrite(MOTOR_PIN, LOW);
   //delay(10);
-  
+
   motor.attach(MOTOR_PIN);
   motor.write(MOTOR_INIT_VAL); // nie moze byc zero
   servo.attach(SERVO_PIN, MIN_SERVO_MS, MAX_SERVO_MS);
@@ -86,157 +87,146 @@ void setup() {
   displayController.setup();
   displayController.setTextAlign( ALIGN_CENTER );
   displayController.writeText( "HELLO123" );
-  displayController.updateImmediate();
-  
+  displayController.updateImmediate(); //??
+
   digitalWrite( LED_BUILTIN, LOW );
-  delay(8000); // zamkienic na 8000 docelowo
+  delay(1000);
   digitalWrite( LED_BUILTIN, HIGH );
 
- 
+
   pauseDuration = getPauseDuration();
   setupSequence(currentDiseaseIndex);
   startSequence();
-  
+
 }
 
-unsigned long getPauseDuration(){
+unsigned long getPauseDuration() {
   unsigned long sum = 0;
-  for( int i = 0; i < INFO_COUNT; i ++ ){
+  for ( int i = 0; i < INFO_COUNT; i ++ ) {
     sum += infoPauses[i];
   }
   return sum;
 }
 
-void setupSequence(int srcIndex){
+void setupSequence(int srcIndex) {
 
-  for( int i = 0; i < VALUES_COUNT; i ++ ){
+  for ( int i = 0; i < VALUES_COUNT; i ++ ) {
 
-    if( i < VALUES_COUNT-1 ){
+    if ( i < VALUES_COUNT - 1 ) {
       mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
-    }else{
+    } else {
       mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], returnDuration, Easing::easeInOutCubic, 0 };
     }
-    
+
   }
-  
+
 }
 
-void setInfoSequence(){
+void setInfoSequence() {
 
-  for( int i = 0; i < INFO_COUNT; i ++ ){
+  for ( int i = 0; i < INFO_COUNT; i ++ ) {
 
     infoKeyframeBuffer[ i ] = { 100, infoPauses[i], Easing::easeInOutCubic, 0 };
-    
+
   }
-  
+
 }
 
 void startSequence() {
-  
+
   sequenceStarted = true;
   mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT );
-  
+
 }
 
-int getCurrentServoPos(){
-  
-  float val = mainTimeline.getCurrentRemappedValue( 
-    angles[mainTimeline.getCurrentKeyIndex()], 
-    angles[(mainTimeline.getCurrentKeyIndex()+1) % (VALUES_COUNT)]
-  );
+int getCurrentServoPos() {
 
-  return int( val ); 
-  
+  float val = mainTimeline.getCurrentRemappedValue(
+                angles[mainTimeline.getCurrentKeyIndex()],
+                angles[(mainTimeline.getCurrentKeyIndex() + 1) % (VALUES_COUNT)]
+              );
+
+  return int( val );
+
 }
 
-int getCurrentMotorSpeed(){
+int getCurrentMotorSpeed() {
 
-  int motorSpeed = map(mainTimeline.getCurrentValue(), deathValBounds[currentDiseaseIndex][0], deathValBounds[currentDiseaseIndex][1], MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
+  int motorSpeed = map(value, deathValBounds[currentDiseaseIndex][0], deathValBounds[currentDiseaseIndex][1], MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
   return motorSpeed;
-  
+
 }
 
 void update() {
-  
+
   mainTimeline.update();
   infoTimeline.update();
-  
+
   displayController.update();
 
   servo.write( getCurrentServoPos() );
-
-  int motorSpeed = ( mainTimeline.getCurrentKeyIndex() < VALUES_COUNT-1 ) ? getCurrentMotorSpeed() : MIN_MOTOR_SPEED;
   motor.write( getCurrentMotorSpeed() );
 
-  
- // Serial.println( diseases[currentDiseaseIndex] );
-  Serial.println( mainTimeline.getCurrentValue() );
-  Serial.println( motorSpeed );
-  //Serial.println( "----" );
-  
+  if ( mainTimeline.isPaused() ) { // PAUZA
 
-  
+    if ( !infoTimeline.isRunning() ) {
 
-  if( mainTimeline.isPaused() ){ // PAUZA
-
-    if( !infoTimeline.isRunning() ){
-      
-      setInfoSequence(); // TODO: do usuniecia - raz w setup wystarczy ?
+      setInfoSequence();
       infoTimeline.play( infoKeyframeBuffer, 4 );
-      
-    }else{
-      
-      switch ( infoTimeline.getCurrentKeyIndex() ){
+
+    } else {
+
+      switch ( infoTimeline.getCurrentKeyIndex() ) {
 
         case 0: // WARTOSC
-           displayController.setTextAlign( ALIGN_CENTER );
-           displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
-           displayController.setBlinkRate( displayBlinkRate );
-        break;
-        
+          displayController.setTextAlign( ALIGN_CENTER );
+          displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+          displayController.setBlinkRate( displayBlinkRate );
+          break;
+
         case 1: // NAZWA
-           displayController.setTextAlign( ALIGN_FREE );
-           displayController.writeText( diseases[currentDiseaseIndex] );
-           displayController.setBlinkRate( 0 );
-        break;
+          displayController.setTextAlign( ALIGN_FREE );
+          displayController.writeText( diseases[currentDiseaseIndex] );
+          displayController.setBlinkRate( 0 );
+          break;
 
         case 2: // DATA
           displayController.setTextAlign( ALIGN_CENTER );
           displayController.writeText( dates[currentDiseaseIndex][mainTimeline.getCurrentKeyIndex()] );
           displayController.setBlinkRate( 0 );
-        break;
+          break;
 
-         case 3: // WARTOSC
-           displayController.setTextAlign( ALIGN_CENTER );
-           displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
-           displayController.setBlinkRate( displayBlinkRate );
-        break;
-        
+        case 3: // WARTOSC
+          displayController.setTextAlign( ALIGN_CENTER );
+          displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
+          displayController.setBlinkRate( displayBlinkRate );
+          break;
+
       }
-      
-    }
-    
-  }else{ // PRZEJSCIE
 
-    if( mainTimeline.getCurrentKeyIndex() < VALUES_COUNT-1 ){ // JESLI KOLEJNE DANE O ZGONACH
+    }
+
+  } else { // PRZEJSCIE
+
+    if ( mainTimeline.getCurrentKeyIndex() < VALUES_COUNT - 1 ) { // JESLI KOLEJNE DANE O ZGONACH
       displayController.setBlinkRate( 0 );
       displayController.setTextAlign( ALIGN_CENTER );
       displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
-    }else{ // JESLI ANIMACJA POWROTU 
+    } else { // JESLI ANIMACJA POWROTU
       displayController.setTextAlign( ALIGN_FREE );
       displayController.writeText( "*/*/*/*/" );
       displayController.setBlinkRate( 0 );
     }
-    
-    
+
+
   }
 
-  if( mainTimeline.isFinished() ){
-    
+  if ( mainTimeline.isFinished() ) {
+
     currentDiseaseIndex = ((currentDiseaseIndex + 1) % DISEASE_COUNT);
     setupSequence( currentDiseaseIndex );
-    mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT, deathValBounds[currentDiseaseIndex][0] );
-    
+    mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT );
+
 
   }
 
@@ -245,8 +235,8 @@ void update() {
 
 
 void loop() {
-  
+
   update();
-  
+
 }
 //EOF.
