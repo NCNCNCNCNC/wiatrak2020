@@ -21,28 +21,28 @@ Servo servo;
 #define DISEASE_COUNT 5
 #define INFO_COUNT 4
 
-char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS-COV"};
+char *diseases[] = {"MEASLES", "COVID-19", "TUBERCULOSIS", "SWINE FLU", "MERS-COV"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
   {1000000, 535300, 454000, 164000, 12000, 8978, 0},
-  {2530000, 2977000, 3500000, 1600000, 1450000, 1800000, 0},
   {36375, 142261, 162935, 160842, 272129, 414975, 0},
+  {2530000, 2977000, 3500000, 1600000, 1450000, 1800000, 0},
   {99, 1369, 3056, 1515, 195, 51, 0},
   {6, 100, 277, 268, 47, 59, 0}
 };
 
 float deathValBounds[DISEASE_COUNT][2] = {
   {8978, 1000000},
-  {1450000, 3500000},
   {36375, 414975},
+    {1450000, 3500000},
   {51, 3056},
   {6, 277}
 };
 char *dates[DISEASE_COUNT][VALUES_COUNT] = {
-  {"1996", "2000", "2004", "2008", "2012", "2016", "///"},
-  {"1990", "1995", "2000", "2005", "2010", "2015", "///"},
-  {"03/2020", "05/2020", "07/2020", "09/2020", "11/2020", "01/2021", "///"},
+  {"/1996/", "/2000/", "/2004/", "/2008/", "/2012/", "/2016/", "///"},
+    {"03/2020", "05/2020", "07/2020", "09/2020", "11/2020", "01/2021", "///"},
+  {"/1990/", "/1995/", "/2000/", "/2005/", "/2010/", "/2015/", "///"},
   {"05/2009", "08/2009", "11/2009", "02/2010", "05/2010", "08/2010", "///"},
-  {"2012", "2013", "2014", "2015", "2016", "2017", "///"}
+  {"/2012/", "/2013/", "/2014/", "/2015/", "/2016/", "/2017/", "///"}
 };
 float angles [] = {0, 0, 36, 72, 108, 144, 180};
 Keyframe mainKeyframeBuffer[VALUES_COUNT];
@@ -216,7 +216,8 @@ void update() {
       displayController.writeNumber( long( mainTimeline.getCurrentValue() ) );
     } else { // JESLI ANIMACJA POWROTU
       displayController.setTextAlign( ALIGN_FREE );
-      displayController.writeText( "*/*/*/*/" );
+      displayController.writeText( "   " );
+      // displayController.writeText( "*/*/*/*/" );
       displayController.setBlinkRate( 0 );
     }
 
