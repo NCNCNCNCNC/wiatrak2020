@@ -21,7 +21,7 @@ Servo servo;
 #define DISEASE_COUNT 5
 #define INFO_COUNT 4
 
-char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS–COV"};
+char *diseases[] = {"MEASLES", "TUBERCULOSIS", "COVID-19", "SWINE FLU", "MERS-COV"};
 float deaths[DISEASE_COUNT][VALUES_COUNT] = {
   {1000000, 535300, 454000, 164000, 12000, 8978, 0},
   {2530000, 2977000, 3500000, 1600000, 1450000, 1800000, 0},
@@ -151,7 +151,7 @@ int getCurrentServoPos(){
 
 int getCurrentMotorSpeed(){
 
-  int motorSpeed = map(value, deathValBounds[currentDiseaseIndex][0], deathValBounds[currentDiseaseIndex][1], MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
+  int motorSpeed = map(mainTimeline.getCurrentValue(), deathValBounds[currentDiseaseIndex][0], deathValBounds[currentDiseaseIndex][1], MIN_MOTOR_SPEED, MAX_MOTOR_SPEED);
   return motorSpeed;
   
 }
@@ -164,13 +164,24 @@ void update() {
   displayController.update();
 
   servo.write( getCurrentServoPos() );
+
+  int motorSpeed = ( mainTimeline.getCurrentKeyIndex() < VALUES_COUNT-1 ) ? getCurrentMotorSpeed() : MIN_MOTOR_SPEED;
   motor.write( getCurrentMotorSpeed() );
+
+  
+ // Serial.println( diseases[currentDiseaseIndex] );
+  Serial.println( mainTimeline.getCurrentValue() );
+  Serial.println( motorSpeed );
+  //Serial.println( "----" );
+  
+
+  
 
   if( mainTimeline.isPaused() ){ // PAUZA
 
     if( !infoTimeline.isRunning() ){
       
-      setInfoSequence();
+      setInfoSequence(); // TODO: do usuniecia - raz w setup wystarczy ?
       infoTimeline.play( infoKeyframeBuffer, 4 );
       
     }else{
@@ -224,7 +235,7 @@ void update() {
     
     currentDiseaseIndex = ((currentDiseaseIndex + 1) % DISEASE_COUNT);
     setupSequence( currentDiseaseIndex );
-    mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT );
+    mainTimeline.play( mainKeyframeBuffer, VALUES_COUNT, deathValBounds[currentDiseaseIndex][0] );
     
 
   }
