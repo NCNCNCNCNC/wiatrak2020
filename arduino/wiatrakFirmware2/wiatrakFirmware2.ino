@@ -90,7 +90,7 @@ void setup() {
   displayController.updateImmediate(); //??
 
   digitalWrite( LED_BUILTIN, LOW );
-  delay(1000);
+  delay(8000);
   digitalWrite( LED_BUILTIN, HIGH );
 
 
