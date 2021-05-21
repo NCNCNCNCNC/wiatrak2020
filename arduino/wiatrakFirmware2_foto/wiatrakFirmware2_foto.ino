@@ -59,7 +59,7 @@ int currentDeathIndex = 0;
 float value = 0.0;
 float ang = 0.0;
 
-unsigned long transitionDuration = 8000;
+unsigned long transitionDuration = 10000;
 unsigned long returnDuration = 8000;
 unsigned long pauseDuration = 0; // ustawiane w setup na bazie pauz w info
 unsigned long transitonTimer = 0;
@@ -114,9 +114,9 @@ void setupSequence(int srcIndex) {
   for ( int i = 0; i < VALUES_COUNT; i ++ ) {
 
     if ( i < VALUES_COUNT - 1 ) {
-      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutCubic, pauseDuration };
+      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], transitionDuration, Easing::easeInOutSine, pauseDuration };
     } else {
-      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], returnDuration, Easing::easeInOutCubic, 0 };
+      mainKeyframeBuffer[ i ] = { deaths[srcIndex][i], returnDuration, Easing::easeInOutSine, 0 };
     }
 
   }
