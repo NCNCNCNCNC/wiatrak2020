@@ -50,7 +50,8 @@ Timeline mainTimeline;
 Keyframe infoKeyframeBuffer[INFO_COUNT];
 Timeline infoTimeline;
 
-int infoPauses[] = { 1000, 3000, 2000, 1000 };
+// wartosc, nazwa, data, wartosc
+int infoPauses[] = { 3000, 3000, 2000, 3000 };
 
 
 int currentDiseaseIndex = 0;
@@ -58,7 +59,7 @@ int currentDeathIndex = 0;
 float value = 0.0;
 float ang = 0.0;
 
-unsigned long transitionDuration = 6000;
+unsigned long transitionDuration = 8000;
 unsigned long returnDuration = 8000;
 unsigned long pauseDuration = 0; // ustawiane w setup na bazie pauz w info
 unsigned long transitonTimer = 0;

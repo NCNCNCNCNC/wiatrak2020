@@ -31,7 +31,7 @@ class DisplayController {
 
     char buff[32];
     float scrollOffset = 0;
-    float scrollSpeed = 0.1;
+    float scrollSpeed = 0.075;
     int txtLen = 0;
     TextAlign txtAlign = ALIGN_LEFT;
     ScrollDir scrollDir = SCROLL_LEFT;
